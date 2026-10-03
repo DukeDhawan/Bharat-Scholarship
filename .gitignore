@@ -1,0 +1,8 @@
+.mota_user_profile.json
+.bharat_user_profile.json
+.bharat_submitted_applications.json
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/

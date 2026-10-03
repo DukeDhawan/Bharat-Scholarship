@@ -1,0 +1,14 @@
+[server]
+address = "127.0.0.1"
+port = 8501
+
+[client]
+toolbarMode = "minimal"
+
+[theme]
+base = "dark"
+primaryColor = "#3B82F6"
+backgroundColor = "#09090b"
+secondaryBackgroundColor = "#121214"
+textColor = "#FAFAFA"
+font = "sans serif"
