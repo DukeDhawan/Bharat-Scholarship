@@ -18,9 +18,14 @@ from core.models import (
 
 logger = logging.getLogger(__name__)
 
-SCHEME_RULES_FILENAME = "MoTA_Scheme_Rules_SIH26239.csv"
-DOCUMENT_REQUIREMENTS_FILENAME = "MoTA_Document_Requirements_SIH26239.csv"
-APPLICANT_DATASET_FILENAME = "MoTA_Scholarship_Fellowship_Applicant_Dataset_SIH26239.csv"
+SCHEME_RULES_FILENAME = "Bharat_Scheme_Rules.csv"
+DOCUMENT_REQUIREMENTS_FILENAME = "Bharat_Document_Requirements.csv"
+APPLICANT_DATASET_FILENAME = "Bharat_Scholarship_Fellowship_Applicant_Dataset.csv"
+LEGACY_DATASET_FILENAMES = {
+    SCHEME_RULES_FILENAME: "MoTA_Scheme_Rules_SIH26239.csv",
+    DOCUMENT_REQUIREMENTS_FILENAME: "MoTA_Document_Requirements_SIH26239.csv",
+    APPLICANT_DATASET_FILENAME: "MoTA_Scholarship_Fellowship_Applicant_Dataset_SIH26239.csv",
+}
 
 _AGE_PAIR_RE = re.compile(
     r"(?P<course>[A-Za-z0-9 .'+/-]+?)\s+(?P<age>\d{1,2})(?:\s*years?)?",
@@ -35,6 +40,7 @@ def get_project_root(start: Optional[Path] = None) -> Path:
         SCHEME_RULES_FILENAME,
         DOCUMENT_REQUIREMENTS_FILENAME,
         APPLICANT_DATASET_FILENAME,
+        *LEGACY_DATASET_FILENAMES.values(),
     }
     for candidate in [cursor, *cursor.parents]:
         if any((candidate / name).is_file() for name in markers):
@@ -48,17 +54,24 @@ class MoTAConfig:
     def __init__(self, root: Optional[Path] = None) -> None:
         self.root = get_project_root(root)
 
+    def _dataset_path(self, filename: str) -> Path:
+        current_path = self.root / filename
+        if current_path.is_file():
+            return current_path
+        legacy_path = self.root / LEGACY_DATASET_FILENAMES[filename]
+        return legacy_path
+
     @property
     def scheme_rules_csv(self) -> Path:
-        return self.root / SCHEME_RULES_FILENAME
+        return self._dataset_path(SCHEME_RULES_FILENAME)
 
     @property
     def document_requirements_csv(self) -> Path:
-        return self.root / DOCUMENT_REQUIREMENTS_FILENAME
+        return self._dataset_path(DOCUMENT_REQUIREMENTS_FILENAME)
 
     @property
     def applicant_dataset_csv(self) -> Path:
-        return self.root / APPLICANT_DATASET_FILENAME
+        return self._dataset_path(APPLICANT_DATASET_FILENAME)
 
     def guideline_pdf(self, filename: str) -> Path:
         return self.root / filename
