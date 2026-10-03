@@ -4,6 +4,7 @@ cd /d "%~dp0"
 
 set "PYTHON=python"
 set "VENV_PYTHON=.venv\Scripts\python.exe"
+set "INSTALL_DEPS=0"
 
 where python >nul 2>&1
 if errorlevel 1 (
@@ -20,14 +21,24 @@ if not exist "%VENV_PYTHON%" (
         pause
         exit /b 1
     )
+    set "INSTALL_DEPS=1"
 )
 
-echo Installing or updating project dependencies...
-"%VENV_PYTHON%" -m pip install -r requirements.txt
-if errorlevel 1 (
-    echo Dependency installation failed.
-    pause
-    exit /b 1
+if not exist ".venv\.requirements-installed" (
+    set "INSTALL_DEPS=1"
+)
+
+if "%INSTALL_DEPS%"=="1" (
+    echo Installing project dependencies for the first run...
+    "%VENV_PYTHON%" -m pip install -r requirements.txt
+    if errorlevel 1 (
+        echo Dependency installation failed.
+        pause
+        exit /b 1
+    )
+    type nul > ".venv\.requirements-installed"
+) else (
+    echo Dependencies already installed. Starting directly...
 )
 
 echo Opening dashboard at http://localhost:8501
